@@ -6,13 +6,19 @@ import 'package:grabber_app/resources/app_color.dart';
 
 class FruitItem extends StatelessWidget {
   FruitModel fruitModel;
-  FruitItem({super.key, required this.fruitModel});
+  Function()? onTap;
+  bool isSelected = false;
+  FruitItem(
+      {super.key,
+      required this.fruitModel,
+      required this.onTap,
+      required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      elevation: 1,
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -32,13 +38,22 @@ class FruitItem extends StatelessWidget {
                             fruitModel.fruitImage,
                           ))),
                 ),
-                const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.add,
-                      size: 18,
-                      color: AppColor.baseBlack,
-                    ))
+                InkWell(
+                  onTap: onTap,
+                  child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: isSelected
+                          ? const Icon(
+                              Icons.remove,
+                              size: 18,
+                              color: AppColor.baseBlack,
+                            )
+                          : const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: AppColor.baseBlack,
+                            )),
+                )
               ],
             ),
             SizedBox(

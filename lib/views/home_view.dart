@@ -1,62 +1,46 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grabber_app/models/categorymodel.dart';
+import 'package:grabber_app/models/data.dart';
 import 'package:grabber_app/models/fruitmodel.dart';
-import 'package:grabber_app/resources/app_assets.dart';
 import 'package:grabber_app/resources/app_color.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:grabber_app/widgets/categorywidget.dart';
 import 'package:grabber_app/widgets/fruitItem.dart';
+import 'package:grabber_app/widgets/sliders.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   static const String routeName = "HomeView";
-  List<String> sliders = [
-    AppAssets.slider1,
-    AppAssets.slider2,
-    AppAssets.slider3
-  ];
-  List<FruitModel> fruits = [
-    FruitModel(
-        fruitImage: "assets/images/Banana.png",
-        fruitName: "Banana",
-        fruitRating: "4.8",
-        numOfPeopleRating: "287",
-        price: "3.99"),
-    FruitModel(
-        fruitImage: "assets/images/pepper.png",
-        fruitName: "Pepper",
-        fruitRating: "4.8",
-        numOfPeopleRating: "287",
-        price: "2.99"),
-    FruitModel(
-        fruitImage: "assets/images/orange.png",
-        fruitName: "Orange",
-        fruitRating: "4.8",
-        numOfPeopleRating: "287",
-        price: "3.99"),
-  ];
-  List<CategoryModel> categories = [
-    CategoryModel(
-        categoryImage: AppAssets.fruitsCategory, categoryTitle: "Fruits"),
-    CategoryModel(
-        categoryImage: AppAssets.milkEggsCategory, categoryTitle: "Milk&Eggs"),
-    CategoryModel(
-        categoryImage: AppAssets.beveragesCategory, categoryTitle: "Beverages"),
-    CategoryModel(
-        categoryImage: AppAssets.laundryCategory, categoryTitle: "Laundry"),
-    CategoryModel(
-        categoryImage: AppAssets.vegetablesCategory,
-        categoryTitle: "Vegetables")
-  ];
+
   HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  List<FruitModel> basketsFruits = [];
+
+  void toggleSelection(FruitModel fruit) {
+    setState(() {
+      if (basketsFruits.contains(fruit)) {
+        basketsFruits.remove(fruit);
+      } else {
+        basketsFruits.add(fruit);
+      }
+    });
+  }
+
+  bool fruitSelected(fruit) {
+    return basketsFruits.contains(fruit);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: Row(children: [
@@ -85,77 +69,143 @@ class HomeView extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.w),
-        child: Column(
-          children: [
-            CarouselSlider.builder(
-              itemCount: sliders.length,
-              itemBuilder:
-                  (BuildContext context, int itemIndex, int pageViewIndex) {
-                return Image.asset(
-                  sliders[itemIndex],
-                );
-              },
-              options: CarouselOptions(
-                  autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 2),
-                  autoPlayAnimationDuration: Duration(seconds: 2),
-                  scrollDirection: Axis.horizontal,
-                  viewportFraction: 0.8,
-                  aspectRatio: 16 / 9,
-                  enlargeCenterPage: true),
-            ),
-            SizedBox(
-              height: 18.h,
-            ),
-            SizedBox(
-              height: 100.h,
-              child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return CategoryWidget(
-                        categoryImage: categories[index].categoryImage,
-                        categoryName: categories[index].categoryTitle);
-                  },
-                  separatorBuilder: (context, index) {
-                    return SizedBox(
-                      width: 20.w,
-                    );
-                  },
-                  itemCount: categories.length),
-            ),
-            SizedBox(
-              height: 34.h,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Fruits",
-                  style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.baseBlack),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SlidersMove(),
+              SizedBox(
+                height: 18.h,
+              ),
+              SizedBox(
+                height: 100.h,
+                child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return CategoryWidget(
+                          categoryImage:
+                              DataApp.categories[index].categoryImage,
+                          categoryName:
+                              DataApp.categories[index].categoryTitle);
+                    },
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        width: 20.w,
+                      );
+                    },
+                    itemCount: DataApp.categories.length),
+              ),
+              SizedBox(
+                height: 34.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Fruits",
+                    style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.baseBlack),
+                  ),
+                  Text(
+                    "See all",
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.primaryColor),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 24.h,
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                    children: List.generate(DataApp.fruits.length, (index) {
+                  return FruitItem(
+                    fruitModel: DataApp.fruits[index],
+                    onTap: () => toggleSelection(DataApp.fruits[index]),
+                    isSelected: fruitSelected(DataApp.fruits[index]),
+                  );
+                })),
+              ),
+              SizedBox(
+                height: 8.h,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                width: double.infinity,
+                height: 70.h,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.r),
+                  color: AppColor.primaryColor,
                 ),
-                Text(
-                  "See all",
-                  style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.primaryColor),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 24.h,
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                  children: List.generate(fruits.length, (index) {
-                return FruitItem(fruitModel: fruits[index]);
-              })),
-            )
-          ],
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: EdgeInsets.symmetric(vertical: 8.sp),
+                            padding: EdgeInsets.all(12.sp),
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            child: Image.asset(
+                              basketsFruits[index].fruitImage,
+                              fit: BoxFit.fill,
+                            ),
+                          );
+                        },
+                        itemCount: basketsFruits.length,
+                        separatorBuilder: (context, index) {
+                          return SizedBox(
+                            width: 8.w,
+                          );
+                        },
+                      ),
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      height: 70,
+                      child: VerticalDivider(
+                        color: Colors.white,
+                        thickness: 1,
+                        indent: 20.h,
+                        endIndent: 20.h,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 8.w,
+                    ),
+                    Text(
+                      "View Basket",
+                      style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
+                    ),
+                    SizedBox(
+                      width: 4.w,
+                    ),
+                    Badge(
+                      largeSize: 12,
+                      label: Text(basketsFruits.length.toString()),
+                      child: SvgPicture.asset(
+                        "assets/images/Icons.svg",
+                        color: Colors.white,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 12.h,
+              )
+            ],
+          ),
         ),
       ),
     );
