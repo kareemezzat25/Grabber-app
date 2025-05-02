@@ -1,14 +1,15 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grabber_app/models/categorymodel.dart';
+import 'package:grabber_app/models/fruitmodel.dart';
 import 'package:grabber_app/resources/app_assets.dart';
 import 'package:grabber_app/resources/app_color.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:grabber_app/widgets/categorywidget.dart';
+import 'package:grabber_app/widgets/fruitItem.dart';
 
 class HomeView extends StatelessWidget {
   static const String routeName = "HomeView";
@@ -16,6 +17,26 @@ class HomeView extends StatelessWidget {
     AppAssets.slider1,
     AppAssets.slider2,
     AppAssets.slider3
+  ];
+  List<FruitModel> fruits = [
+    FruitModel(
+        fruitImage: "assets/images/Banana.png",
+        fruitName: "Banana",
+        fruitRating: "4.8",
+        numOfPeopleRating: "287",
+        price: "3.99"),
+    FruitModel(
+        fruitImage: "assets/images/pepper.png",
+        fruitName: "Pepper",
+        fruitRating: "4.8",
+        numOfPeopleRating: "287",
+        price: "2.99"),
+    FruitModel(
+        fruitImage: "assets/images/orange.png",
+        fruitName: "Orange",
+        fruitRating: "4.8",
+        numOfPeopleRating: "287",
+        price: "3.99"),
   ];
   List<CategoryModel> categories = [
     CategoryModel(
@@ -39,7 +60,7 @@ class HomeView extends StatelessWidget {
         leading: SizedBox.shrink(),
         leadingWidth: 0,
         title: Row(children: [
-          Icon(Icons.motorcycle),
+          const Icon(Icons.motorcycle),
           SizedBox(
             width: 12.w,
           ),
@@ -53,7 +74,7 @@ class HomeView extends StatelessWidget {
           SizedBox(
             width: 16.w,
           ),
-          Icon(
+          const Icon(
             Icons.keyboard_arrow_down_rounded,
             size: 24,
             color: AppColor.textBlack,
@@ -123,6 +144,16 @@ class HomeView extends StatelessWidget {
                       color: AppColor.primaryColor),
                 )
               ],
+            ),
+            SizedBox(
+              height: 24.h,
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  children: List.generate(fruits.length, (index) {
+                return FruitItem(fruitModel: fruits[index]);
+              })),
             )
           ],
         ),
